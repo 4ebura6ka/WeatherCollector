@@ -27,7 +27,7 @@ namespace Web
         {
             services.AddRazorPages();
 
-            services.AddDbContextPool<WeatheCollectorDbContext>(options =>
+            services.AddDbContextPool<WeatherCollectorDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("WeatherCollectorDb"));
             });

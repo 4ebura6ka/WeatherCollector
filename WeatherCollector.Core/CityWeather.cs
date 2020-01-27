@@ -10,6 +10,5 @@ namespace WeatherCollector.Core
         public int? Precipitation { get; set; }
 
         public string Weather { get; set; }
-
     }
 }

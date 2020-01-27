@@ -3,6 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherCollector", "WeatherCollector\WeatherCollector.csproj", "{B6237467-C328-4B03-81E0-4228D78AB331}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{A2323739-F426-456F-8EED-9743EC3AA648}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherCollector.Core", "WeatherCollector.Core\WeatherCollector.Core.csproj", "{021E59D6-C199-42BC-98EA-D1A426AA6A61}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,5 +17,13 @@ Global
 		{B6237467-C328-4B03-81E0-4228D78AB331}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6237467-C328-4B03-81E0-4228D78AB331}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6237467-C328-4B03-81E0-4228D78AB331}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2323739-F426-456F-8EED-9743EC3AA648}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2323739-F426-456F-8EED-9743EC3AA648}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2323739-F426-456F-8EED-9743EC3AA648}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2323739-F426-456F-8EED-9743EC3AA648}.Release|Any CPU.Build.0 = Release|Any CPU
+		{021E59D6-C199-42BC-98EA-D1A426AA6A61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{021E59D6-C199-42BC-98EA-D1A426AA6A61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{021E59D6-C199-42BC-98EA-D1A426AA6A61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{021E59D6-C199-42BC-98EA-D1A426AA6A61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -21,11 +21,12 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WeatherCollector.Core\WeatherCollector.Core.csproj">
-      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-    </ProjectReference>
+    <Folder Include="WeatherCollector.Core\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="WeatherCollector.Core\" />
+    <ProjectReference Include="..\WeatherCollector.Core\WeatherCollector.Core.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+      <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
+    </ProjectReference>
   </ItemGroup>
 </Project>

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.EnvironmentVariables;
-using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 
@@ -12,15 +11,29 @@ namespace WeatherCollector
 {
     class Program
     {
-        public static IConfigurationRoot Configuration { get; set; }
+        private static ServiceProvider serviceProvider;
 
         private static List<string> cities;
+
+        private static ILogger<Program> logger;
+
+        private static IConfiguration configuration;
 
         static void Main(string[] args)
         {
             ApplicationConfiguration();
 
             cities = ParseCities(args);
+
+            var weatherCollector = new WeatherCollector(
+                configuration,
+                serviceProvider.GetService<IWeatherData>(),
+                serviceProvider.GetService<ILoggerFactory>().CreateLogger<WeatherCollector>()
+            ); 
+
+            weatherCollector.Authorize();
+
+            weatherCollector.CollectWeatherInformation(cities);
         }
 
         private static string RemoveComma(string word)
@@ -62,22 +75,30 @@ namespace WeatherCollector
         private static void ApplicationConfiguration()
         {
             var builder = new ConfigurationBuilder()
-             .SetBasePath(Directory.GetCurrentDirectory())
-             .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
-
-            Configuration = builder.Build();
+             .SetBasePath(Directory.GetCurrentDirectory());
+#if DEBUG
+            builder.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+#else
+            builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+#endif
+            configuration = builder.Build();
 
             var services = new ServiceCollection()
                 .AddLogging();
 
-            services.AddDbContextPool<WeatherCollectorDbContext>((Action<DbContextOptionsBuilder>)(options =>
+            services.AddDbContextPool<WeatherCollectorDbContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("WeatherCollectorDb"));
-            }));
+                options.UseSqlServer(configuration.GetConnectionString("WeatherCollectorDb"));
+            });
 
             services.AddSingleton<IWeatherData, WeatherData>();
 
-            var serviceProvider = services.BuildServiceProvider();
+            serviceProvider = services.BuildServiceProvider();
+
+            logger = serviceProvider.GetService<ILoggerFactory>()
+                .CreateLogger<Program>();
+
+            logger.LogInformation("Application started");
         }
     }
 }

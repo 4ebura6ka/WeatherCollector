@@ -2,7 +2,7 @@
 
 namespace Infrastructure
 {
-    public class CityWeather
+    public class CityWeatherEntity
     {
         public int Id { get; set; }
 

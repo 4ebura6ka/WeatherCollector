@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure
@@ -13,7 +12,7 @@ namespace Infrastructure
             weatherCollectorDbContext = dbContext;
         }
 
-        public CityWeather Save (CityWeather cityWeather)
+        public CityWeatherEntity Save (CityWeatherEntity cityWeather)
         {
             if (GetWeatherByCity(cityWeather.City).Count() > 0)
             {
@@ -23,20 +22,20 @@ namespace Infrastructure
             return Add(cityWeather);
         }
 
-        public CityWeather Add (CityWeather cityWeather)
+        public CityWeatherEntity Add (CityWeatherEntity cityWeather)
         {
             weatherCollectorDbContext.Add(cityWeather);
             return cityWeather;
         }
 
-        public CityWeather Update (CityWeather cityWeather)
+        public CityWeatherEntity Update (CityWeatherEntity cityWeather)
         {
             var entity = weatherCollectorDbContext.cityWeathers.Attach(cityWeather);
             entity.State = EntityState.Modified;
             return cityWeather;
         }
 
-        public IEnumerable<CityWeather> GetWeatherByCity (string name)
+        public IEnumerable<CityWeatherEntity> GetWeatherByCity (string name)
         {
             return weatherCollectorDbContext.cityWeathers.Where(x => x.City == name);
         }

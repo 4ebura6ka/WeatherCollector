@@ -4,13 +4,13 @@ namespace Infrastructure
 {
     public interface IWeatherData
     {
-        CityWeather Save(CityWeather cityWeather);
+        CityWeatherEntity Save(CityWeatherEntity cityWeather);
 
-        CityWeather Update(CityWeather cityWeather);
+        CityWeatherEntity Update(CityWeatherEntity cityWeather);
 
-        CityWeather Add(CityWeather cityWeather);
+        CityWeatherEntity Add(CityWeatherEntity cityWeather);
 
-        IEnumerable<CityWeather> GetWeatherByCity(string name);
+        IEnumerable<CityWeatherEntity> GetWeatherByCity(string name);
 
         int Commit();
     }

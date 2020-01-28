@@ -16,9 +16,9 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <param name="request">Use username and password that were provided for you.</param>
         /// <returns>AuthorizationResponse</returns>
-        AuthorizationResponse Authorize (AuthorizationRequest request);
+        AuthorizationResponse Authorize(AuthorizationRequest request);
     }
-  
+
     /// <summary>
     /// Represents a collection of functions to interact with the API endpoints
     /// </summary>
@@ -32,11 +32,11 @@ namespace IO.Swagger.Api
         public AuthorizationApi(ApiClient apiClient = null)
         {
             if (apiClient == null) // use the default one in Configuration
-                this.ApiClient = Configuration.DefaultApiClient; 
+                this.ApiClient = Configuration.DefaultApiClient;
             else
                 this.ApiClient = apiClient;
         }
-    
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthorizationApi"/> class.
         /// </summary>
@@ -45,7 +45,7 @@ namespace IO.Swagger.Api
         {
             this.ApiClient = new ApiClient(basePath);
         }
-    
+
         /// <summary>
         /// Sets the base path of the API client.
         /// </summary>
@@ -55,7 +55,7 @@ namespace IO.Swagger.Api
         {
             this.ApiClient.BasePath = basePath;
         }
-    
+
         /// <summary>
         /// Gets the base path of the API client.
         /// </summary>
@@ -65,46 +65,46 @@ namespace IO.Swagger.Api
         {
             return this.ApiClient.BasePath;
         }
-    
+
         /// <summary>
         /// Gets or sets the API client.
         /// </summary>
         /// <value>An instance of the ApiClient</value>
-        public ApiClient ApiClient {get; set;}
-    
+        public ApiClient ApiClient { get; set; }
+
         /// <summary>
         /// Returns token for authorizing other requests. 
         /// </summary>
         /// <param name="request">Use username and password that were provided for you.</param> 
         /// <returns>AuthorizationResponse</returns>            
-        public AuthorizationResponse Authorize (AuthorizationRequest request)
+        public AuthorizationResponse Authorize(AuthorizationRequest request)
         {
-            
-    
+
+
             var path = "/api/authorize";
             path = path.Replace("{format}", "json");
-                
+
             var queryParams = new Dictionary<String, String>();
             var headerParams = new Dictionary<String, String>();
             var formParams = new Dictionary<String, String>();
             var fileParams = new Dictionary<String, FileParameter>();
             String postBody = null;
-    
-                                                postBody = ApiClient.Serialize(request); // http body (model) parameter
-    
+
+            postBody = ApiClient.Serialize(request); // http body (model) parameter
+
             // authentication setting, if any
-            String[] authSettings = new String[] {  };
-    
+            String[] authSettings = new String[] { };
+
             // make the HTTP request
-            IRestResponse response = (IRestResponse) ApiClient.CallApi(path, Method.POST, queryParams, postBody, headerParams, formParams, fileParams, authSettings);
-    
+            IRestResponse response = (IRestResponse)ApiClient.CallApi(path, Method.POST, queryParams, postBody, headerParams, formParams, fileParams, authSettings);
+
             if (((int)response.StatusCode) >= 400)
-                throw new ApiException ((int)response.StatusCode, "Error calling Authorize: " + response.Content, response.Content);
+                throw new ApiException((int)response.StatusCode, "Error calling Authorize: " + response.Content, response.Content);
             else if (((int)response.StatusCode) == 0)
-                throw new ApiException ((int)response.StatusCode, "Error calling Authorize: " + response.ErrorMessage, response.ErrorMessage);
-    
-            return (AuthorizationResponse) ApiClient.Deserialize(response.Content, typeof(AuthorizationResponse), response.Headers);
+                throw new ApiException((int)response.StatusCode, "Error calling Authorize: " + response.ErrorMessage, response.ErrorMessage);
+
+            return (AuthorizationResponse)ApiClient.Deserialize(response.Content, typeof(AuthorizationResponse), response.Headers);
         }
-    
+
     }
 }

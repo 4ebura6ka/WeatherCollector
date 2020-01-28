@@ -15,9 +15,9 @@ namespace IO.Swagger.Api
         /// </summary>
         /// <param name="authorization">Token received from &#x60;authorization&#x60; endpoint. Provide it as \&quot;&#x60;bearer {token}&#x60;\&quot;.</param>
         /// <returns>List&lt;string&gt;</returns>
-        List<string> GetCities (string authorization);
+        List<string> GetCities(string authorization);
     }
-  
+
     /// <summary>
     /// Represents a collection of functions to interact with the API endpoints
     /// </summary>
@@ -31,11 +31,11 @@ namespace IO.Swagger.Api
         public CitiesApi(ApiClient apiClient = null)
         {
             if (apiClient == null) // use the default one in Configuration
-                this.ApiClient = Configuration.DefaultApiClient; 
+                this.ApiClient = Configuration.DefaultApiClient;
             else
                 this.ApiClient = apiClient;
         }
-    
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CitiesApi"/> class.
         /// </summary>
@@ -44,7 +44,7 @@ namespace IO.Swagger.Api
         {
             this.ApiClient = new ApiClient(basePath);
         }
-    
+
         /// <summary>
         /// Sets the base path of the API client.
         /// </summary>
@@ -54,7 +54,7 @@ namespace IO.Swagger.Api
         {
             this.ApiClient.BasePath = basePath;
         }
-    
+
         /// <summary>
         /// Gets the base path of the API client.
         /// </summary>
@@ -64,49 +64,49 @@ namespace IO.Swagger.Api
         {
             return this.ApiClient.BasePath;
         }
-    
+
         /// <summary>
         /// Gets or sets the API client.
         /// </summary>
         /// <value>An instance of the ApiClient</value>
-        public ApiClient ApiClient {get; set;}
-    
+        public ApiClient ApiClient { get; set; }
+
         /// <summary>
         /// Returns list of cities for querying weather data. 
         /// </summary>
         /// <param name="authorization">Token received from &#x60;authorization&#x60; endpoint. Provide it as \&quot;&#x60;bearer {token}&#x60;\&quot;.</param> 
         /// <returns>List&lt;string&gt;</returns>            
-        public List<string> GetCities (string authorization)
+        public List<string> GetCities(string authorization)
         {
-            
+
             // verify the required parameter 'authorization' is set
             if (authorization == null) throw new ApiException(400, "Missing required parameter 'authorization' when calling GetCities");
-            
-    
+
+
             var path = "/api/Cities";
             path = path.Replace("{format}", "json");
-                
+
             var queryParams = new Dictionary<String, String>();
             var headerParams = new Dictionary<String, String>();
             var formParams = new Dictionary<String, String>();
             var fileParams = new Dictionary<String, FileParameter>();
             String postBody = null;
-    
-                         if (authorization != null) headerParams.Add("Authorization", ApiClient.ParameterToString(authorization)); // header parameter
-                            
+
+            if (authorization != null) headerParams.Add("Authorization", ApiClient.ParameterToString(authorization)); // header parameter
+
             // authentication setting, if any
-            String[] authSettings = new String[] {  };
-    
+            String[] authSettings = new String[] { };
+
             // make the HTTP request
-            IRestResponse response = (IRestResponse) ApiClient.CallApi(path, Method.GET, queryParams, postBody, headerParams, formParams, fileParams, authSettings);
-    
+            IRestResponse response = (IRestResponse)ApiClient.CallApi(path, Method.GET, queryParams, postBody, headerParams, formParams, fileParams, authSettings);
+
             if (((int)response.StatusCode) >= 400)
-                throw new ApiException ((int)response.StatusCode, "Error calling GetCities: " + response.Content, response.Content);
+                throw new ApiException((int)response.StatusCode, "Error calling GetCities: " + response.Content, response.Content);
             else if (((int)response.StatusCode) == 0)
-                throw new ApiException ((int)response.StatusCode, "Error calling GetCities: " + response.ErrorMessage, response.ErrorMessage);
-    
-            return (List<string>) ApiClient.Deserialize(response.Content, typeof(List<string>), response.Headers);
+                throw new ApiException((int)response.StatusCode, "Error calling GetCities: " + response.ErrorMessage, response.ErrorMessage);
+
+            return (List<string>)ApiClient.Deserialize(response.Content, typeof(List<string>), response.Headers);
         }
-    
+
     }
 }

@@ -10,7 +10,7 @@ namespace Infrastructure
 
         CityWeatherEntity Add(CityWeatherEntity cityWeather);
 
-        IEnumerable<CityWeatherEntity> GetWeatherByCity(string name);
+        CityWeatherEntity GetCityWeather(string name);
 
         int Commit();
     }

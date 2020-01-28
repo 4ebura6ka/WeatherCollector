@@ -14,9 +14,16 @@ namespace Infrastructure
 
         public CityWeatherEntity Save (CityWeatherEntity cityWeather)
         {
-            if (GetWeatherByCity(cityWeather.City).Count() > 0)
+            var city = GetCityWeather(cityWeather.City);
+
+            if (city != null)
             {
-                return Update(cityWeather);
+                city.Weather = cityWeather.Weather;
+                city.City = cityWeather.City;
+                city.Precipitation = cityWeather.Precipitation;
+                city.Temperature = cityWeather.Temperature;
+
+                return Update(city);
             }
 
             return Add(cityWeather);
@@ -32,12 +39,13 @@ namespace Infrastructure
         {
             var entity = weatherCollectorDbContext.cityWeathers.Attach(cityWeather);
             entity.State = EntityState.Modified;
+
             return cityWeather;
         }
 
-        public IEnumerable<CityWeatherEntity> GetWeatherByCity (string name)
+        public CityWeatherEntity GetCityWeather (string name)
         {
-            return weatherCollectorDbContext.cityWeathers.Where(x => x.City == name);
+            return weatherCollectorDbContext.cityWeathers.SingleOrDefault(x => x.City == name);
         }
 
         public int Commit()

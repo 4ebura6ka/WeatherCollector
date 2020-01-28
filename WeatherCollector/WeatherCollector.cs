@@ -3,41 +3,54 @@ using IO.Swagger.Model;
 using IO.Swagger.Api;
 using IO.Swagger.Client;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
+using Infrastructure;
 
 namespace WeatherCollector
 {
     public class WeatherCollector
     {
-        public ApiClient ApiClient { get; set; }
+        public ApiClient apiClient { get; set; }
 
-        private string bearer;
+        private string authenticationHeader;
 
-        public WeatherCollector()
+        private readonly IConfiguration configuration;
+        private readonly IWeatherData weatherData;
+
+        public WeatherCollector(IConfiguration configuration, IWeatherData weatherData)
         {
-            ApiClient ApiClient = new ApiClient("http://metasite-weather-api.herokuapp.com");
+            this.configuration = configuration;
+            this.weatherData = weatherData;
+
+            ApiClient ApiClient = new ApiClient(configuration.GetConnectionString("ApiBasePath"));
         }
 
         public void Authorize()
         {
-            AuthorizationApi authorizationApi = new AuthorizationApi(ApiClient);
+            AuthorizationApi authorizationApi = new AuthorizationApi(apiClient);
 
             AuthorizationRequest authorizationRequest = new AuthorizationRequest();
-            authorizationRequest.Username = "meta";
-            authorizationRequest.Password = "site";
+            authorizationRequest.Username = configuration.GetConnectionString("ApiUser");
+            authorizationRequest.Password = configuration.GetConnectionString("ApiPass");
 
             AuthorizationResponse authorizationResponse = authorizationApi.Authorize(authorizationRequest);
-            bearer = authorizationResponse.Bearer;
+            authenticationHeader = "bearer " + authorizationResponse.Bearer;
         }
 
         public void CollectWeatherInformation(List<string> cities)
         {
-            WeatherApi weatherApi = new WeatherApi(ApiClient);
-            CityWeather cityWeather = weatherApi.GetWeatherForCity("Vilnius", "bearer " + bearer);
+            WeatherApi weatherApi = new WeatherApi(apiClient);
+
+            foreach (var city in cities)
+            {
+                CityWeather cityWeather = weatherApi.GetWeatherForCity(city, authenticationHeader);
+                Save(cityWeather);
+            }
         }
 
-        public void Save()
+        public void Save(CityWeather cityWeather)
         {
-         /*   Infrastructure.CityWeather city = new Infrastructure.CityWeather()
+            CityWeatherEntity city = new CityWeatherEntity()
             {
                 City = cityWeather.City,
                 Precipitation = cityWeather.Precipitation,
@@ -45,8 +58,8 @@ namespace WeatherCollector
                 Weather = cityWeather.Weather
             };
 
-            serviceProvider.GetService<IWeatherData>().Save(city);
-            serviceProvider.GetService<IWeatherData>().Commit();*/
+            weatherData.Save(city);
+            weatherData.Commit();
         }
     }
 }

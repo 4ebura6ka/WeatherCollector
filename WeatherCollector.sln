@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherCollector", "Weather
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{5739417B-E5FA-462F-B7E2-BED606DC1F6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherCollector.Core", "WeatherCollector.Core\WeatherCollector.Core.csproj", "{EA3A140F-69CC-48DA-958A-E44D62A69A7C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeatherCollector.Api", "WeatherCollector.Api\WeatherCollector.Api.csproj", "{D9D6ED40-A0A6-448C-B0D8-93B14D980F4A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +21,9 @@ Global
 		{5739417B-E5FA-462F-B7E2-BED606DC1F6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5739417B-E5FA-462F-B7E2-BED606DC1F6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5739417B-E5FA-462F-B7E2-BED606DC1F6D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EA3A140F-69CC-48DA-958A-E44D62A69A7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EA3A140F-69CC-48DA-958A-E44D62A69A7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EA3A140F-69CC-48DA-958A-E44D62A69A7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EA3A140F-69CC-48DA-958A-E44D62A69A7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9D6ED40-A0A6-448C-B0D8-93B14D980F4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9D6ED40-A0A6-448C-B0D8-93B14D980F4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9D6ED40-A0A6-448C-B0D8-93B14D980F4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9D6ED40-A0A6-448C-B0D8-93B14D980F4A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

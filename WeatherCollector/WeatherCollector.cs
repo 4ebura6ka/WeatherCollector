@@ -40,24 +40,30 @@ namespace WeatherCollector
             authorizationHeader = "bearer " + authorizationResponse.Bearer;
         }
 
-        public void CollectWeatherInformation(List<string> cities)
+        public List<CityWeatherEntity> CollectWeatherInformation(List<string> cities)
         {
             WeatherApi weatherApi = new WeatherApi(ApiClient);
 
             CitiesApi citiesApi = new CitiesApi(ApiClient);
             var availableCities = citiesApi.GetCities(authorizationHeader);
 
+            List<CityWeatherEntity> citiesWeatherInformation = new List<CityWeatherEntity>();
+
             foreach (var city in cities)
             {
                 if (availableCities.Contains(city))
                 {
-                    CityWeather cityWeather = weatherApi.GetWeatherForCity(city, authorizationHeader);
-                    Save(cityWeather);
+                    var cityWeather = weatherApi.GetWeatherForCity(city, authorizationHeader);
+
+                    var  cityWeatherEntity = Save(cityWeather);
+                    citiesWeatherInformation.Add(cityWeatherEntity);
                 }
             }
+
+            return citiesWeatherInformation;
         }
 
-        public void Save(CityWeather cityWeather)
+        public CityWeatherEntity Save(CityWeather cityWeather)
         {
             CityWeatherEntity city = new CityWeatherEntity()
             {
@@ -67,10 +73,12 @@ namespace WeatherCollector
                 Weather = cityWeather.Weather
             };
 
-            logger.LogDebug(cityWeather.ToString());
+            logger.LogInformation(cityWeather.ToString());
 
             weatherData.Save(city);
             weatherData.Commit();
+
+            return city;
         }
     }
 }

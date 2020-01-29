@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 using Microsoft.Extensions.Logging.Console;
+using System.Timers;
 
 namespace WeatherCollector
 {
@@ -20,13 +21,19 @@ namespace WeatherCollector
 
         private static IConfiguration configuration;
 
+        private static WeatherCollector weatherCollector;
+
+        private static InformationDisplay informationDisplay = new InformationDisplay();
+
+        private static Timer timer;
+
         static void Main(string[] args)
         {
             ApplicationConfiguration();
 
             cities = ParseCities(args);
 
-            var weatherCollector = new WeatherCollector(
+            weatherCollector = new WeatherCollector(
                 configuration,
                 serviceProvider.GetService<IWeatherData>(),
                 serviceProvider.GetService<ILoggerFactory>().CreateLogger<WeatherCollector>()
@@ -34,7 +41,36 @@ namespace WeatherCollector
 
             weatherCollector.Authorize();
 
-            weatherCollector.CollectWeatherInformation(cities);
+            RetrieveCitiesWeatherInformation();
+
+            SetTimer();
+
+            while (Console.ReadKey().Key != ConsoleKey.Enter) { }
+
+            timer.Stop();
+            timer.Dispose();
+        }
+
+        private static void SetTimer()
+        {
+            timer = new Timer(30000);
+            timer.Elapsed += OnTimedEvent;
+            timer.AutoReset = true;
+            timer.Enabled = true;
+        }
+
+        private static void RetrieveCitiesWeatherInformation()
+        {
+            var citiesWeatherInformation = weatherCollector.CollectWeatherInformation(cities);
+
+            informationDisplay.Display(citiesWeatherInformation);
+
+            Console.WriteLine("\nPress <Enter> to exit the process...\n");
+        }
+
+        private static void OnTimedEvent (Object source, ElapsedEventArgs e)
+        {
+            RetrieveCitiesWeatherInformation();
         }
 
         private static string RemoveComma(string word)
@@ -87,7 +123,7 @@ namespace WeatherCollector
             var services = new ServiceCollection()
                 .AddLogging(builder => builder
                     .AddConsole()
-                    .AddFilter(level => level >= LogLevel.Debug));
+                    .AddFilter(level => level >= LogLevel.Warning));
 
             services.AddDbContextPool<WeatherCollectorDbContext>(options =>
             {

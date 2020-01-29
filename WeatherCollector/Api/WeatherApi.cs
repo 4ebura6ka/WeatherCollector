@@ -17,7 +17,7 @@ namespace IO.Swagger.Api
         /// <param name="city">City from &#x60;Cities&#x60; endpoint.</param>
         /// <param name="authorization">Token received from &#x60;authorization&#x60; endpoint. Provide it as \&quot;&#x60;bearer {token}&#x60;\&quot;.</param>
         /// <returns>CityWeather</returns>
-        CityWeather GetWeatherForCity(string city, string authorization);
+        CityWeather GetCityWeather(string city, string authorization);
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ namespace IO.Swagger.Api
         /// <param name="city">City from &#x60;Cities&#x60; endpoint.</param> 
         /// <param name="authorization">Token received from &#x60;authorization&#x60; endpoint. Provide it as \&quot;&#x60;bearer {token}&#x60;\&quot;.</param> 
         /// <returns>CityWeather</returns>            
-        public CityWeather GetWeatherForCity(string city, string authorization)
+        public CityWeather GetCityWeather(string city, string authorization)
         {
 
             // verify the required parameter 'city' is set

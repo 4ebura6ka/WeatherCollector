@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Infrastructure;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace WeatherCollector
 {
@@ -47,20 +49,27 @@ namespace WeatherCollector
             CitiesApi citiesApi = new CitiesApi(ApiClient);
             var availableCities = citiesApi.GetCities(authorizationHeader);
 
-            List<CityWeatherEntity> citiesWeatherInformation = new List<CityWeatherEntity>();
+            List<CityWeather> receivedWeatherInformation = new List<CityWeather>();
 
-            foreach (var city in cities)
+            List<Task> weatherRetrievalTasks = new List<Task>();
+
+            Parallel.ForEach(cities, city =>
             {
-                if (availableCities.Contains(city))
-                {
-                    var cityWeather = weatherApi.GetWeatherForCity(city, authorizationHeader);
+               if (availableCities.Contains(city))
+               {
+                    var cityWeather = weatherApi.GetCityWeather(city, authorizationHeader);
+                    receivedWeatherInformation.Add(cityWeather);
+               }
+            });
 
-                    var  cityWeatherEntity = Save(cityWeather);
-                    citiesWeatherInformation.Add(cityWeatherEntity);
-                }
+            List<CityWeatherEntity> savedCitiesWeatherInformation = new List<CityWeatherEntity>();
+            foreach (var city in receivedWeatherInformation)
+            {
+                var cityWeatherEntity = Save(city);
+                savedCitiesWeatherInformation.Add(cityWeatherEntity);
             }
 
-            return citiesWeatherInformation;
+            return savedCitiesWeatherInformation;
         }
 
         public CityWeatherEntity Save(CityWeather cityWeather)

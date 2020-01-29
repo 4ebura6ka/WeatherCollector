@@ -13,7 +13,7 @@ namespace WeatherCollector
     {
         public ApiClient ApiClient { get; set; }
 
-        private string authenticationHeader;
+        private string authorizationHeader;
 
         private readonly IConfiguration configuration;
         private readonly IWeatherData weatherData;
@@ -37,17 +37,23 @@ namespace WeatherCollector
             authorizationRequest.Password = configuration.GetConnectionString("ApiPass");
 
             AuthorizationResponse authorizationResponse = authorizationApi.Authorize(authorizationRequest);
-            authenticationHeader = "bearer " + authorizationResponse.Bearer;
+            authorizationHeader = "bearer " + authorizationResponse.Bearer;
         }
 
         public void CollectWeatherInformation(List<string> cities)
         {
             WeatherApi weatherApi = new WeatherApi(ApiClient);
 
+            CitiesApi citiesApi = new CitiesApi(ApiClient);
+            var availableCities = citiesApi.GetCities(authorizationHeader);
+
             foreach (var city in cities)
             {
-                CityWeather cityWeather = weatherApi.GetWeatherForCity(city, authenticationHeader);
-                Save(cityWeather);
+                if (availableCities.Contains(city))
+                {
+                    CityWeather cityWeather = weatherApi.GetWeatherForCity(city, authorizationHeader);
+                    Save(cityWeather);
+                }
             }
         }
 

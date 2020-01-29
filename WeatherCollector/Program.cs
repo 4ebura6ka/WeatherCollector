@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
+using Microsoft.Extensions.Logging.Console;
 
 namespace WeatherCollector
 {
@@ -84,7 +85,9 @@ namespace WeatherCollector
             configuration = builder.Build();
 
             var services = new ServiceCollection()
-                .AddLogging();
+                .AddLogging(builder => builder
+                    .AddConsole()
+                    .AddFilter(level => level >= LogLevel.Debug));
 
             services.AddDbContextPool<WeatherCollectorDbContext>(options =>
             {
@@ -98,7 +101,7 @@ namespace WeatherCollector
             logger = serviceProvider.GetService<ILoggerFactory>()
                 .CreateLogger<Program>();
 
-            logger.LogInformation("Application started");
+            logger.LogDebug("Application started");
         }
     }
 }

@@ -6,8 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
+using IO.Swagger.Api;
+using IO.Swagger.Client;
 using Microsoft.Extensions.Logging.Console;
 using System.Timers;
+using System.Linq;
 
 namespace WeatherCollector
 {
@@ -31,15 +34,10 @@ namespace WeatherCollector
         {
             ApplicationConfiguration();
 
-            cities = ParseCities(args);
-
-            weatherCollector = new WeatherCollector(
-                configuration,
-                serviceProvider.GetService<IWeatherData>(),
-                serviceProvider.GetService<ILoggerFactory>().CreateLogger<WeatherCollector>()
-            ); 
-
-            weatherCollector.Authorize();
+            ArgumentsParser argumentsParser = new ArgumentsParser();
+            cities = argumentsParser.ParseCities(args);
+            
+            WeatherCollectorSetup();
 
             RetrieveCitiesWeatherInformation();
 
@@ -49,6 +47,24 @@ namespace WeatherCollector
 
             timer.Stop();
             timer.Dispose();
+        }
+
+        private static void WeatherCollectorSetup()
+        {
+            weatherCollector = new WeatherCollector(
+                configuration,
+                serviceProvider.GetService<IWeatherData>(),
+                serviceProvider.GetService<ILoggerFactory>().CreateLogger<WeatherCollector>()
+            );
+
+            ApiClient apiClient = new ApiClient(configuration.GetConnectionString("ApiBasePath"));
+            weatherCollector.ApiClient = apiClient;
+
+            weatherCollector.WeatherApi = new WeatherApi(apiClient);
+            weatherCollector.AuthorizationApi = new AuthorizationApi(apiClient);
+            weatherCollector.CitiesApi = new CitiesApi(apiClient);
+
+            weatherCollector.Authorize();
         }
 
         private static void SetTimer()
@@ -61,7 +77,7 @@ namespace WeatherCollector
 
         private static void RetrieveCitiesWeatherInformation()
         {
-            var citiesWeatherInformation = weatherCollector.CollectWeatherInformation(cities);
+            var citiesWeatherInformation = weatherCollector.CollectWeatherInformation(cities).ToList();
 
             informationDisplay.Display(citiesWeatherInformation);
 
@@ -71,42 +87,6 @@ namespace WeatherCollector
         private static void OnTimedEvent (Object source, ElapsedEventArgs e)
         {
             RetrieveCitiesWeatherInformation();
-        }
-
-        private static string RemoveComma(string word)
-        {
-            return word.Replace(",", string.Empty);
-        }
-
-        private static List<string> ParseCities(string[] args)
-        {
-            var argsLength = args.Length;
-
-            if (argsLength < 4)
-            {
-                throw new ArgumentException("Incorrect number of arguments");
-            }
-
-            int startCitiesList;
-
-            for (startCitiesList = 0; startCitiesList < argsLength; startCitiesList++)
-            {
-                if (args[startCitiesList] == "--city")
-                {
-                    startCitiesList++;
-                    break;
-                }
-            }
-
-            List<string> cities = new List<string>();
-
-            for (var citiesIndex = startCitiesList; citiesIndex < argsLength; citiesIndex++)
-            {
-                string cityName = RemoveComma(args[citiesIndex]);
-                cities.Add(cityName);
-            }
-
-            return cities;
         }
 
         private static void ApplicationConfiguration()

@@ -15,64 +15,67 @@ namespace WeatherCollector
     {
         public ApiClient ApiClient { get; set; }
 
+        public WeatherApi WeatherApi { get; set; }
+
+        public AuthorizationApi AuthorizationApi { get; set; }
+
+        public CitiesApi CitiesApi { get; set; }
+
         private string authorizationHeader;
 
         private readonly IConfiguration configuration;
         private readonly IWeatherData weatherData;
-        private readonly ILogger<WeatherCollector>  logger;
+        private readonly ILogger<WeatherCollector> logger;
 
         public WeatherCollector(IConfiguration configuration, IWeatherData weatherData, ILogger<WeatherCollector> logger)
         {
             this.configuration = configuration;
             this.weatherData = weatherData;
             this.logger = logger;
-
-            ApiClient = new ApiClient(configuration.GetConnectionString("ApiBasePath"));
         }
 
         public void Authorize()
         {
-            AuthorizationApi authorizationApi = new AuthorizationApi(ApiClient);
-
             AuthorizationRequest authorizationRequest = new AuthorizationRequest();
             authorizationRequest.Username = configuration.GetConnectionString("ApiUser");
             authorizationRequest.Password = configuration.GetConnectionString("ApiPass");
 
-            AuthorizationResponse authorizationResponse = authorizationApi.Authorize(authorizationRequest);
+            AuthorizationResponse authorizationResponse = AuthorizationApi.Authorize(authorizationRequest);
             authorizationHeader = "bearer " + authorizationResponse.Bearer;
         }
 
-        public List<CityWeatherEntity> CollectWeatherInformation(List<string> cities)
+        public ICollection<CityWeatherEntity> CollectWeatherInformation(List<string> cities)
         {
-            WeatherApi weatherApi = new WeatherApi(ApiClient);
-
-            CitiesApi citiesApi = new CitiesApi(ApiClient);
-            var availableCities = citiesApi.GetCities(authorizationHeader);
+            var availableCities = CitiesApi.GetCities(authorizationHeader);
 
             List<CityWeather> receivedWeatherInformation = new List<CityWeather>();
-
-            List<Task> weatherRetrievalTasks = new List<Task>();
 
             Parallel.ForEach(cities, city =>
             {
                if (availableCities.Contains(city))
                {
-                    var cityWeather = weatherApi.GetCityWeather(city, authorizationHeader);
+                    var cityWeather = WeatherApi.GetCityWeather(city, authorizationHeader);
                     receivedWeatherInformation.Add(cityWeather);
                }
+               else
+                {
+                    logger.LogWarning($"{city} information was not retrieved, no forecast for mentioned city.");
+                }
             });
 
             List<CityWeatherEntity> savedCitiesWeatherInformation = new List<CityWeatherEntity>();
             foreach (var city in receivedWeatherInformation)
             {
-                var cityWeatherEntity = Save(city);
+                var cityWeatherEntity = SaveCityWeatherData(city);
                 savedCitiesWeatherInformation.Add(cityWeatherEntity);
             }
+
+            weatherData.Commit();
 
             return savedCitiesWeatherInformation;
         }
 
-        public CityWeatherEntity Save(CityWeather cityWeather)
+        private CityWeatherEntity SaveCityWeatherData(CityWeather cityWeather)
         {
             CityWeatherEntity city = new CityWeatherEntity()
             {
@@ -85,7 +88,6 @@ namespace WeatherCollector
             logger.LogInformation(cityWeather.ToString());
 
             weatherData.Save(city);
-            weatherData.Commit();
 
             return city;
         }

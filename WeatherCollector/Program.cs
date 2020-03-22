@@ -11,6 +11,8 @@ using IO.Swagger.Client;
 using Microsoft.Extensions.Logging.Console;
 using System.Timers;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace WeatherCollector
 {
@@ -28,7 +30,9 @@ namespace WeatherCollector
 
         private static InformationDisplay informationDisplay = new InformationDisplay();
 
-        private static Timer timer;
+        private static Stopwatch stopWatch = new Stopwatch();
+
+        private static Timer _timer;
 
         static void Main(string[] args)
         {
@@ -45,8 +49,8 @@ namespace WeatherCollector
 
             while (Console.ReadKey().Key != ConsoleKey.Enter) { }
 
-            timer.Stop();
-            timer.Dispose();
+            _timer.Stop();
+            _timer.Dispose();
         }
 
         private static void WeatherCollectorSetup()
@@ -69,19 +73,36 @@ namespace WeatherCollector
 
         private static void SetTimer()
         {
-            timer = new Timer(30000);
-            timer.Elapsed += OnTimedEvent;
-            timer.AutoReset = true;
-            timer.Enabled = true;
+            _timer = new Timer(10000);
+            _timer.Elapsed += OnTimedEvent;
+            _timer.AutoReset = true;
+            _timer.Enabled = true;
         }
 
-        private static void RetrieveCitiesWeatherInformation()
+        private static async Task RetrieveCitiesWeatherInformation()
         {
-            var citiesWeatherInformation = weatherCollector.CollectWeatherInformation(cities).ToList();
+            Console.WriteLine("Time elapsed:\n"); 
+            stopWatch = Stopwatch.StartNew();
 
-            informationDisplay.Display(citiesWeatherInformation);
+            var citiesWeatherInformationAsync = await weatherCollector.CollectWeatherInformationAsync(cities);
+            stopWatch.Stop();
+            Console.WriteLine($"\tfor async request: {stopWatch.ElapsedMilliseconds}ms");
 
-            Console.WriteLine("\nPress <Enter> to exit the process...\n");
+            stopWatch = Stopwatch.StartNew();
+
+            var citiesWeatherInformationParallel =  weatherCollector.CollectWeatherInformationParallel(cities).ToList();
+            stopWatch.Stop();
+            Console.WriteLine($"\tfor parallel request: {stopWatch.ElapsedMilliseconds}ms");
+
+            stopWatch = Stopwatch.StartNew();
+
+            var citiesWeatherInformationSequential = weatherCollector.CollectWeatherInformationSequential(cities).ToList();
+            stopWatch.Stop();
+            Console.WriteLine($"\tfor sequential request: {stopWatch.ElapsedMilliseconds}ms\n");
+
+            // informationDisplay.Display(citiesWeatherInformation.ToList());
+
+            Console.WriteLine($"\nPress any key to exit...\n");
         }
 
         private static void OnTimedEvent (Object source, ElapsedEventArgs e)

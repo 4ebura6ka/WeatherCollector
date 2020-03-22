@@ -44,7 +44,8 @@ namespace WeatherCollector
             authorizationHeader = "bearer " + authorizationResponse.Bearer;
         }
 
-        public ICollection<CityWeatherEntity> CollectWeatherInformation(List<string> cities)
+
+        public ICollection<CityWeatherEntity> CollectWeatherInformationParallel(List<string> cities)
         {
             var availableCities = CitiesApi.GetCities(authorizationHeader);
 
@@ -70,10 +71,84 @@ namespace WeatherCollector
                 savedCitiesWeatherInformation.Add(cityWeatherEntity);
             }
 
+
             weatherData.Commit();
 
             return savedCitiesWeatherInformation;
         }
+
+        public async Task<ICollection<CityWeatherEntity>> CollectWeatherInformationAsync (List<string> cities)
+        {
+            var availableCities = CitiesApi.GetCities(authorizationHeader);
+
+            var receivedWeatherInformation = new List<CityWeather>();
+            var retrieveCityWeatherTasks = new List<Task<CityWeather>>();
+
+            foreach (var city in cities)
+            {
+                if (availableCities.Contains(city))
+                {
+                    var task = Task.Run(() => WeatherApi.GetCityWeather(city, authorizationHeader));
+                    retrieveCityWeatherTasks.Add(task);
+                }
+                else
+                {
+                    logger.LogWarning($"{city} information was not retrieved, no forecast for mentioned city.");
+                }
+            }
+
+            var results = await Task.WhenAll(retrieveCityWeatherTasks);
+
+            foreach (var result in results)
+            {
+                receivedWeatherInformation.Add(result);
+            }
+
+            List<CityWeatherEntity> savedCitiesWeatherInformation = new List<CityWeatherEntity>();
+            foreach (var city in receivedWeatherInformation)
+            {
+                var cityWeatherEntity = SaveCityWeatherData(city);
+                savedCitiesWeatherInformation.Add(cityWeatherEntity);
+            }
+
+            weatherData.Commit();
+
+            return savedCitiesWeatherInformation;
+        }
+
+        public ICollection<CityWeatherEntity> CollectWeatherInformationSequential(List<string> cities)
+        {
+            var availableCities = CitiesApi.GetCities(authorizationHeader);
+
+            List<CityWeather> receivedWeatherInformation = new List<CityWeather>();
+
+            List<Task<CityWeather>> retrieveCityWeatherTasks = new List<Task<CityWeather>>();
+
+            foreach (var city in cities)
+            {
+                if (availableCities.Contains(city))
+                {
+                    var cityWeather = WeatherApi.GetCityWeather(city, authorizationHeader);
+                    receivedWeatherInformation.Add(cityWeather);
+                }
+                else
+                {
+                    logger.LogWarning($"{city} information was not retrieved, no forecast for mentioned city.");
+                }
+            }
+
+            List<CityWeatherEntity> savedCitiesWeatherInformation = new List<CityWeatherEntity>();
+            foreach (var city in receivedWeatherInformation)
+            {
+                var cityWeatherEntity = SaveCityWeatherData(city);
+                savedCitiesWeatherInformation.Add(cityWeatherEntity);
+            }
+
+            weatherData.Commit();
+
+            return savedCitiesWeatherInformation;
+        }
+
 
         private CityWeatherEntity SaveCityWeatherData(CityWeather cityWeather)
         {
@@ -87,7 +162,7 @@ namespace WeatherCollector
 
             logger.LogInformation(cityWeather.ToString());
 
-            weatherData.Save(city);
+            //weatherData.Save(city);
 
             return city;
         }

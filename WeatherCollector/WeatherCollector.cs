@@ -1,12 +1,10 @@
-﻿using System;
-using IO.Swagger.Model;
+﻿using IO.Swagger.Model;
 using IO.Swagger.Api;
 using IO.Swagger.Client;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Infrastructure;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace WeatherCollector

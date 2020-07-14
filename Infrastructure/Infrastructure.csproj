@@ -26,10 +26,4 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\WeatherCollector.Core\WeatherCollector.Core.csproj">
-      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-      <ReferenceSourceTarget>ProjectReference</ReferenceSourceTarget>
-    </ProjectReference>
-  </ItemGroup>
 </Project>

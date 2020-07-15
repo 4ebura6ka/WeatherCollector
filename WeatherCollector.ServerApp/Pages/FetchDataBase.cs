@@ -16,42 +16,46 @@ namespace WeatherCollector.ServerApp
     {
         protected WeatherForecast[] forecasts;
 
-        WeatherCollector weatherCollector;
-
         [Inject]
-        public IConfiguration configuration { get; set; }
-
-        [Inject]
-        private IWeatherData weatherData { get; set; }
-
-        [Inject]
-        private ILogger<WeatherCollector> logger { get; set; }
+        WeatherCollector weatherCollector { get; set; }
 
         public string Cities { get; set; }
+
+        public List<CityWeatherEntity> CityWeatherList { get; set;  } = new List<CityWeatherEntity>();
+        
+        private List<string> ParseCities (string cities)
+        {
+            var parsedCities = new List<string>();
+
+            var whiteSpaceIndex = cities.IndexOf(" ");
+
+            while (whiteSpaceIndex > 0)
+            {
+                var cityName = cities.Substring(0, whiteSpaceIndex - 1);
+                cities = cities.Substring(whiteSpaceIndex + 1, cities.Length - 1);
+                whiteSpaceIndex = cities.IndexOf(" ");
+                parsedCities.Add(cityName);
+            }
+            parsedCities.Add(cities);
+
+            return parsedCities;
+        }
         protected override async Task OnInitializedAsync()
         {
-            weatherCollector = new WeatherCollector(configuration, weatherData, logger);
-
-            ApiClient apiClient = new ApiClient(configuration.GetConnectionString("ApiBasePath"));
-            weatherCollector.ApiClient = apiClient;
-
-            weatherCollector.WeatherApi = new WeatherApi(apiClient);
-            weatherCollector.AuthorizationApi = new AuthorizationApi(apiClient);
-            weatherCollector.CitiesApi = new CitiesApi(apiClient);
-
-            weatherCollector.Authorize();
         }
 
-        protected async EventCallback CollectCityWeatherInParallelMode()
+        protected async Task CollectCityWeatherInParallelMode()
         {
 
         }
 
-        protected async EventCallback CollectCityWeatherInAsyncMode()
-        { 
+        protected async Task CollectCityWeatherInAsyncMode()
+        {
+            var parsedCities = ParseCities(Cities);
+            CityWeatherList = (await weatherCollector.CollectWeatherInformationAsync(parsedCities)).ToList();
         }
 
-        protected async EventCallBack CollectCityWeatherInSequentialMode()
+        protected async Task CollectCityWeatherInSequentialMode()
         {
 
         }

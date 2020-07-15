@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using WeatherCollector.ServerApp.Data;
 
 namespace WeatherCollector.ServerApp
@@ -29,8 +32,11 @@ namespace WeatherCollector.ServerApp
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-
-            //serviceProvider.GetService<ILoggerFactory>().CreateLogger<WeatherCollector>()
+            services.AddDbContextPool<WeatherCollectorDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("WeatherCollectorDb"));
+            });
+            services.AddSingleton<IWeatherData, WeatherData>();      
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

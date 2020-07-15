@@ -36,7 +36,7 @@ namespace WeatherCollector
 
         static void Main(string[] args)
         {
-            ApplicationConfiguration();
+            ConfigureServices();
 
             ArgumentsParser argumentsParser = new ArgumentsParser();
             cities = argumentsParser.ParseCities(args);
@@ -110,7 +110,7 @@ namespace WeatherCollector
             RetrieveCitiesWeatherInformation();
         }
 
-        private static void ApplicationConfiguration()
+        private static void ConfigureServices()
         {
             var builder = new ConfigurationBuilder()
              .SetBasePath(Directory.GetCurrentDirectory());

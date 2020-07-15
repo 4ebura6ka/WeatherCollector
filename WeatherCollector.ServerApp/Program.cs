@@ -23,6 +23,10 @@ namespace WeatherCollector.ServerApp
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureLogging(logging =>
+                {
+                    logging.AddConsole();
                 });
     }
 }

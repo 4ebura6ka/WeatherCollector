@@ -4,4 +4,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WeatherCollector.Api\WeatherCollector.Api.csproj" />
+    <ProjectReference Include="..\WeatherCollector\WeatherCollector.csproj" />
+  </ItemGroup>
+
 </Project>

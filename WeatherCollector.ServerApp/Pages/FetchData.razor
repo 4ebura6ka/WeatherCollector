@@ -11,7 +11,7 @@
         <a class="btn btn-primary" @onclick="@CollectCityWeatherInParallelMode"> Parallel </a>
         <a class="btn btn-primary" @onclick="@CollectCityWeatherInSequentialMode"> Sequential </a>
                
-        @if (forecasts == null)
+        @if (CityWeatherList == null)
         {
             <p><em>Loading...</em></p>
         }
@@ -22,20 +22,19 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Date</th>
-                        <th>Temp. (C)</th>
-                        <th>Temp. (F)</th>
+                        <th>Temp. (C) / Temp. (F)</th>
+                        <th>Precipitation</th>
                         <th>Summary</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var forecast in forecasts)
+                    @foreach (var forecast in CityWeatherList)
                     {
                         <tr>
-                            <td>@forecast.Date.ToShortDateString()</td>
-                            <td>@forecast.TemperatureC</td>
-                            <td>@forecast.TemperatureF</td>
-                            <td>@forecast.Summary</td>
+                            <td>@forecast.City</td>
+                            <td>@forecast.Temperature</td>
+                            <td>@forecast.Precipitation</td>
+                            <td>@forecast.Weather</td>
                         </tr>
                     }
                 </tbody>

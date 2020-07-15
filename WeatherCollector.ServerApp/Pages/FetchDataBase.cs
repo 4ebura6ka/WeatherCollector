@@ -14,8 +14,6 @@ namespace WeatherCollector.ServerApp
 {
     public class FetchDataBase : ComponentBase
     {
-        protected WeatherForecast[] forecasts;
-
         [Inject]
         WeatherCollector weatherCollector { get; set; }
 

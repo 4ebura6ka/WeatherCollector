@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WeatherCollector
+namespace WeatherCollector.ConsoleApp
 {
     public class ArgumentsParser
     {

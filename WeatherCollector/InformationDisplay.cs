@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Infrastructure;
 
-namespace WeatherCollector
+namespace WeatherCollector.ConsoleApp
 {
     public class InformationDisplay
     {

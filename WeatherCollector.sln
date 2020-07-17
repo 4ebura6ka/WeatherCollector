@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherCollector", "WeatherCollector\WeatherCollector.csproj", "{B6237467-C328-4B03-81E0-4228D78AB331}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeatherCollector.ConsoleApp", "WeatherCollector\WeatherCollector.ConsoleApp.csproj", "{B6237467-C328-4B03-81E0-4228D78AB331}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{5739417B-E5FA-462F-B7E2-BED606DC1F6D}"
 EndProject

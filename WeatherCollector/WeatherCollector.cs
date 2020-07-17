@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Infrastructure;
 using System.Threading.Tasks;
 
-namespace WeatherCollector
+namespace WeatherCollector.ConsoleApp
 {
     public class WeatherCollector
     {
@@ -154,7 +154,7 @@ namespace WeatherCollector
             {
                 City = cityWeather.City,
                 Precipitation = cityWeather.Precipitation,
-                Temperature = cityWeather.Temperature,
+                TemperatureC = cityWeather.Temperature,
                 Weather = cityWeather.Weather
             };
 

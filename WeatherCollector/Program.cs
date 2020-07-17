@@ -14,7 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace WeatherCollector
+namespace WeatherCollector.ConsoleApp
 {
     class Program
     {

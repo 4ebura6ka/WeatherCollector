@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WeatherCollector.ConsoleApp": {
+      "commandName": "Project",
+      "commandLineArgs": "--cities Vilnius, Moscow, Riga"
+    }
+  }
+}

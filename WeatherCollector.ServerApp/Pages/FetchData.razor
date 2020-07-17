@@ -1,54 +1,41 @@
 ﻿@page "/fetchdata"
 @inherits FetchDataBase
 
-    <section class="bg-secondary">
-        <h1>Weather forecast for cities</h1>
-        <EditForm Model="model">
-            <p>Cities: <InputText @bind-Value="model.Cities" placeholder="Enter needed cities"></InputText></p>
-        </EditForm>
+    <h1>Weather forecast for cities</h1>
+    <EditForm Model="@ForecastModel">
+        <p>Cities: <InputText @bind-Value="@ForecastModel.Cities"></InputText></p>
+    </EditForm>
 
-        <h2> Requests </h2>
-        <a class="btn btn-primary" @onclick="@CollectCityWeatherInAsyncMode"> Async </a>
-        <a class="btn btn-primary" @onclick="@CollectCityWeatherInParallelMode"> Parallel </a>
-        <a class="btn btn-primary" @onclick="@CollectCityWeatherInSequentialMode"> Sequential </a>
-               
-        @if (CityWeatherList == null)
-        {
-            <p><em>Loading...</em></p>
-        }
-        else
-        {
-            <h2> Execution time: </h2>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Temp. (C) / Temp. (F)</th>
-                        <th>Precipitation</th>
-                        <th>Summary</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var forecast in CityWeatherList)
-                    {
-                        <tr>
-                            <td>@forecast.City</td>
-                            <td>@forecast.TemperatureC / @forecast.TemperatureF </td>
-                            <td>@forecast.Precipitation</td>
-                            <td>@forecast.Weather</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+    <a class="btn btn-primary" @onclick="@RetrieveCityWeatherAsync"> Async </a>
+    <a class="btn btn-primary" @onclick="@RetrieveCityWeatherParallel"> Parallel </a>
+    <a class="btn btn-primary" @onclick="@RetrieveCityWeatherSequential"> Sequential </a>
 
-    </section>
-
-@code
-{
-    private Model model = new Model();
-
-    public class Model {
-        public string Cities { get; set; } = string.Empty;
+    @if (CityWeatherList == null)
+    {
+        <p><em>Loading...</em></p>
     }
-} 
+    else
+    {
+        <p> Execution time: <label>@ExecutionTime </label></p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Temp. (C) / Temp. (F)</th>
+                    <th>Precipitation</th>
+                    <th>Summary</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var forecast in CityWeatherList)
+                {
+                    <tr>
+                        <td>@forecast.City</td>
+                        <td>@forecast.TemperatureC / @forecast.TemperatureF </td>
+                        <td>@forecast.Precipitation</td>
+                        <td>@forecast.Weather</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }

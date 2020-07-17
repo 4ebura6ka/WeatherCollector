@@ -2,7 +2,7 @@
   "profiles": {
     "WeatherCollector.ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "--city Vilnius, Moscow, Riga"
+      "commandLineArgs": "--city Vilnius, Zagreb, Nicosia, Prague, Copenhagen, Tallinn, Helsinki, Paris, Tbilisi, Berlin, Athens, Tirana, Yerevan, Vienna, Baku, Minsk, Brussels, Sarajevo, Sofia"
     }
   }
 }

@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using System.IO;
 using IO.Swagger.Api;
 using IO.Swagger.Client;
-using Microsoft.Extensions.Logging.Console;
 using System.Timers;
 using System.Linq;
 using System.Threading.Tasks;

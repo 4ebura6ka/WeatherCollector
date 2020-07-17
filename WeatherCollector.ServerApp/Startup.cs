@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using WeatherCollector.ConsoleApp;
 
 namespace WeatherCollector.ServerApp
 {
@@ -31,6 +32,7 @@ namespace WeatherCollector.ServerApp
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<ConsoleApp.WeatherCollector>();
+            services.AddScoped<WeatherCollectorApi>();
             services.AddDbContextPool<WeatherCollectorDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("WeatherCollectorDb"));

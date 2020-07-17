@@ -6,9 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using WeatherCollector.ConsoleApp;
+using WeatherCollector.ServerApp.Data;
 
 namespace WeatherCollector.ServerApp
 {
@@ -17,20 +19,30 @@ namespace WeatherCollector.ServerApp
         [Inject]
         ConsoleApp.WeatherCollector WeatherCollector { get; set; }
 
-        public List<WeatherEntity> CityWeatherList { get; set; } = new List<WeatherEntity>();
+        [Inject]
+        IConfiguration Configuration { get; set; }
 
+        [Inject]
+        WeatherCollectorApi WeatherCollectorApi { get; set; }
+
+        private Stopwatch stopWatch;
+
+        public string ExecutionTime { get; set; }
+
+        public List<WeatherEntity> CityWeatherList { get; set; }
+
+        public ForecastModel ForecastModel { get; set; } = new ForecastModel();
         private List<string> ParseCities(string cities)
         {
             var parsedCities = new List<string>();
-
             var whiteSpaceIndex = cities.IndexOf(" ");
 
             while (whiteSpaceIndex > 0)
             {
-                var cityName = cities.Substring(0, whiteSpaceIndex - 1);
-                cities = cities.Substring(whiteSpaceIndex + 1, cities.Length - 1);
-                whiteSpaceIndex = cities.IndexOf(" ");
+                var cityName = cities.Substring(0, whiteSpaceIndex);
                 parsedCities.Add(cityName);
+                cities = cities.Substring(whiteSpaceIndex + 1);
+                whiteSpaceIndex = cities.IndexOf(" ");
             }
             parsedCities.Add(cities);
 
@@ -38,22 +50,50 @@ namespace WeatherCollector.ServerApp
         }
         protected override async Task OnInitializedAsync()
         {
+            SetWeatherCollectorApi();
         }
 
-        protected async Task CollectCityWeatherInParallelMode()
+        protected void RetrieveCityWeatherParallel()
         {
+            var parsedCities = ParseCities(ForecastModel.Cities);
 
+            var _cities = WeatherCollectorApi.FilterAvailableCities(parsedCities);
+            stopWatch = Stopwatch.StartNew();
+            CityWeatherList = WeatherCollector.RetrieveWeatherParallel(_cities).ToList();
+            stopWatch.Stop();
+            ExecutionTime = $"parallel - {stopWatch.ElapsedMilliseconds}ms";
         }
 
-        protected async Task CollectCityWeatherInAsyncMode()
+        protected async Task RetrieveCityWeatherAsync()
         {
-            var parsedCities = ParseCities("Vilnius, Riga, Moscow");
-            CityWeatherList = (await WeatherCollector.RetrieveWeatherAsync(parsedCities)).ToList();
+            var parsedCities = ParseCities(ForecastModel.Cities);
+            
+            var _cities = WeatherCollectorApi.FilterAvailableCities(parsedCities);
+            stopWatch = Stopwatch.StartNew();
+            CityWeatherList = (await WeatherCollector.RetrieveWeatherAsync(_cities)).ToList();
+            stopWatch.Stop();
+            ExecutionTime = $"async - {stopWatch.ElapsedMilliseconds}ms";
         }
 
-        protected async Task CollectCityWeatherInSequentialMode()
+        protected void RetrieveCityWeatherSequential()
         {
+            var parsedCities = ParseCities(ForecastModel.Cities);
 
+            var _cities = WeatherCollectorApi.FilterAvailableCities(parsedCities);
+            stopWatch = Stopwatch.StartNew();
+            CityWeatherList = WeatherCollector.RetrieveWeatherSequential(_cities).ToList();
+            stopWatch.Stop();
+            ExecutionTime = $"sequential - {stopWatch.ElapsedMilliseconds}ms";
+        }
+
+        private void SetWeatherCollectorApi()
+        {
+            ApiClient apiClient = new ApiClient(Configuration.GetConnectionString("ApiBasePath"));
+            WeatherCollectorApi.ApiClient = apiClient;
+            WeatherCollectorApi.WeatherApi = new WeatherApi(apiClient);
+            WeatherCollectorApi.AuthorizationApi = new AuthorizationApi(apiClient);
+            WeatherCollectorApi.CitiesApi = new CitiesApi(apiClient);
+            WeatherCollectorApi.Authorize(Configuration.GetConnectionString("ApiUser"), Configuration.GetConnectionString("ApiPass"));
         }
     }
 }

@@ -10,7 +10,9 @@ namespace Infrastructure
         [Required, StringLength(80)]
         public string City { get; set; }
 
-        public double? Temperature { get; set; }
+        public double? TemperatureC { get; set; }
+
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 
         public int? Precipitation { get; set; }
 
@@ -20,7 +22,7 @@ namespace Infrastructure
         {
             var sb = new StringBuilder();
             sb.Append("  City: ").Append(City).Append("\n");
-            sb.Append("  Temperature: ").Append(Temperature).Append("\n");
+            sb.Append("  Temperature: ").Append(TemperatureC).Append("\n");
             sb.Append("  Precipitation: ").Append(Precipitation).Append("\n");
             sb.Append("  Weather: ").Append(Weather).Append("\n");
             return sb.ToString();

@@ -3,8 +3,9 @@
 
     <section class="bg-secondary">
         <h1>Weather forecast for cities</h1>
-
-        <p>Cities: <InputText @bind-Value="Cities" placeholder="Enter needed cities" /></p>
+        <EditForm Model="model">
+            <p>Cities: <InputText @bind-Value="model.Cities" placeholder="Enter needed cities"></InputText></p>
+        </EditForm>
 
         <h2> Requests </h2>
         <a class="btn btn-primary" @onclick="@CollectCityWeatherInAsyncMode"> Async </a>
@@ -32,7 +33,7 @@
                     {
                         <tr>
                             <td>@forecast.City</td>
-                            <td>@forecast.Temperature</td>
+                            <td>@forecast.TemperatureC / @forecast.TemperatureF </td>
                             <td>@forecast.Precipitation</td>
                             <td>@forecast.Weather</td>
                         </tr>
@@ -42,3 +43,12 @@
         }
 
     </section>
+
+@code
+{
+    private Model model = new Model();
+
+    public class Model {
+        public string Cities { get; set; } = string.Empty;
+    }
+} 

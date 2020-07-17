@@ -8,20 +8,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WeatherCollector;
+using WeatherCollector.ConsoleApp;
 
 namespace WeatherCollector.ServerApp
 {
     public class FetchDataBase : ComponentBase
     {
         [Inject]
-        WeatherCollector weatherCollector { get; set; }
+        ConsoleApp.WeatherCollector WeatherCollector { get; set; }
 
-        public string Cities { get; set; }
+        public List<CityWeatherEntity> CityWeatherList { get; set; } = new List<CityWeatherEntity>();
 
-        public List<CityWeatherEntity> CityWeatherList { get; set;  } = new List<CityWeatherEntity>();
-        
-        private List<string> ParseCities (string cities)
+        private List<string> ParseCities(string cities)
         {
             var parsedCities = new List<string>();
 
@@ -49,24 +47,13 @@ namespace WeatherCollector.ServerApp
 
         protected async Task CollectCityWeatherInAsyncMode()
         {
-            var parsedCities = ParseCities(Cities);
-            CityWeatherList = (await weatherCollector.CollectWeatherInformationAsync(parsedCities)).ToList();
+            var parsedCities = ParseCities("Vilnius, Riga, Moscow");
+            CityWeatherList = (await WeatherCollector.CollectWeatherInformationAsync(parsedCities)).ToList();
         }
 
         protected async Task CollectCityWeatherInSequentialMode()
         {
 
         }
-    }
-
-    public class WeatherForecast
-    {
-        public DateTime Date { get; set; }
-
-        public int TemperatureC { get; set; }
-
-        public string Summary { get; set; }
-
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
     }
 }

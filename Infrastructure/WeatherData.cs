@@ -21,7 +21,7 @@ namespace Infrastructure
                 city.Weather = cityWeather.Weather;
                 city.City = cityWeather.City;
                 city.Precipitation = cityWeather.Precipitation;
-                city.Temperature = cityWeather.Temperature;
+                city.TemperatureC = cityWeather.TemperatureC;
 
                 return Update(city);
             }

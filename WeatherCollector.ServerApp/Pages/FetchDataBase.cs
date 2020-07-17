@@ -17,7 +17,7 @@ namespace WeatherCollector.ServerApp
         [Inject]
         ConsoleApp.WeatherCollector WeatherCollector { get; set; }
 
-        public List<CityWeatherEntity> CityWeatherList { get; set; } = new List<CityWeatherEntity>();
+        public List<WeatherEntity> CityWeatherList { get; set; } = new List<WeatherEntity>();
 
         private List<string> ParseCities(string cities)
         {
@@ -48,7 +48,7 @@ namespace WeatherCollector.ServerApp
         protected async Task CollectCityWeatherInAsyncMode()
         {
             var parsedCities = ParseCities("Vilnius, Riga, Moscow");
-            CityWeatherList = (await WeatherCollector.CollectWeatherInformationAsync(parsedCities)).ToList();
+            CityWeatherList = (await WeatherCollector.RetrieveWeatherAsync(parsedCities)).ToList();
         }
 
         protected async Task CollectCityWeatherInSequentialMode()

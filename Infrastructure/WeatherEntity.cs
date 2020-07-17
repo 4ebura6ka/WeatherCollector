@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Infrastructure
 {
-    public class CityWeatherEntity
+    public class WeatherEntity
     {
         public int Id { get; set; }
 

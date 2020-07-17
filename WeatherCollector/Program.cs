@@ -19,16 +19,18 @@ namespace WeatherCollector.ConsoleApp
     class Program
     {
         private static ServiceProvider serviceProvider;
-
-        private static List<string> cities;
-
+        
         private static ILogger<Program> logger;
 
         private static IConfiguration configuration;
 
+        private static List<string> _cities;
+
         private static WeatherCollector weatherCollector;
 
-        private static InformationDisplay informationDisplay = new InformationDisplay();
+        private static WeatherCollectorApi weatherCollectorApi;
+
+        private static InformationDisplay informationDisplay;
 
         private static Stopwatch stopWatch = new Stopwatch();
 
@@ -38,12 +40,25 @@ namespace WeatherCollector.ConsoleApp
         {
             ConfigureServices();
 
-            ArgumentsParser argumentsParser = new ArgumentsParser();
-            cities = argumentsParser.ParseCities(args);
+            var argumentsParser = new ArgumentsParser();
+            var cities = argumentsParser.ParseCities(args);
             
-            WeatherCollectorSetup();
+            weatherCollectorApi = WeatherCollectorApiSetup(configuration, 
+                serviceProvider.GetService<ILoggerFactory>().CreateLogger<WeatherCollectorApi>()
+                );
 
-            RetrieveCitiesWeatherInformation();
+            _cities = weatherCollectorApi.FilterAvailableCities(cities);
+            
+            weatherCollector = new WeatherCollector(
+                serviceProvider.GetService<IWeatherData>(),
+                weatherCollectorApi,
+                serviceProvider.GetService<ILoggerFactory>().CreateLogger<WeatherCollector>()
+            );
+
+            var citiesWeather = RetrieveCitiesWeatherInformation(_cities).Result;
+
+            informationDisplay = new InformationDisplay();
+            informationDisplay.PrintConsole(citiesWeather.ToList());
 
             SetTimer();
 
@@ -53,22 +68,40 @@ namespace WeatherCollector.ConsoleApp
             _timer.Dispose();
         }
 
-        private static void WeatherCollectorSetup()
+        private static WeatherCollectorApi WeatherCollectorApiSetup(IConfiguration configuration, ILogger<WeatherCollectorApi> logger)
         {
-            weatherCollector = new WeatherCollector(
-                configuration,
-                serviceProvider.GetService<IWeatherData>(),
-                serviceProvider.GetService<ILoggerFactory>().CreateLogger<WeatherCollector>()
-            );
-
+            var weatherCollectorApi = new WeatherCollectorApi(logger);
+        
             ApiClient apiClient = new ApiClient(configuration.GetConnectionString("ApiBasePath"));
-            weatherCollector.ApiClient = apiClient;
+            weatherCollectorApi.ApiClient = apiClient;
+            weatherCollectorApi.WeatherApi = new WeatherApi(apiClient);
+            weatherCollectorApi.AuthorizationApi = new AuthorizationApi(apiClient);
+            weatherCollectorApi.CitiesApi = new CitiesApi(apiClient);
+            weatherCollectorApi.Authorize(configuration.GetConnectionString("ApiUser"), configuration.GetConnectionString("ApiPass"));
 
-            weatherCollector.WeatherApi = new WeatherApi(apiClient);
-            weatherCollector.AuthorizationApi = new AuthorizationApi(apiClient);
-            weatherCollector.CitiesApi = new CitiesApi(apiClient);
+            return weatherCollectorApi;
+        }
 
-            weatherCollector.Authorize();
+        private static async Task<ICollection<WeatherEntity>> RetrieveCitiesWeatherInformation(List<string> cities)
+        {
+            Console.WriteLine("Time elapsed:\n"); 
+
+            stopWatch = Stopwatch.StartNew();
+            var citiesWeatherAsync = await weatherCollector.RetrieveWeatherAsync(cities);
+            stopWatch.Stop();
+            Console.WriteLine($"\tfor async request: {stopWatch.ElapsedMilliseconds}ms");
+
+            stopWatch = Stopwatch.StartNew();
+            var citiesWeatherParallel =  weatherCollector.RetrieveWeatherParallel(cities).ToList();
+            stopWatch.Stop();
+            Console.WriteLine($"\tfor parallel request: {stopWatch.ElapsedMilliseconds}ms");
+
+            stopWatch = Stopwatch.StartNew();
+            var citiesWeatherSequential = weatherCollector.RetrieveWeatherSequential(cities).ToList();
+            stopWatch.Stop();
+            Console.WriteLine($"\tfor sequential request: {stopWatch.ElapsedMilliseconds}ms\n");
+
+            return citiesWeatherSequential;
         }
 
         private static void SetTimer()
@@ -79,35 +112,12 @@ namespace WeatherCollector.ConsoleApp
             _timer.Enabled = true;
         }
 
-        private static async Task RetrieveCitiesWeatherInformation()
+        private static async void OnTimedEvent (Object source, ElapsedEventArgs e)
         {
-            Console.WriteLine("Time elapsed:\n"); 
-            stopWatch = Stopwatch.StartNew();
-
-            var citiesWeatherInformationAsync = await weatherCollector.CollectWeatherInformationAsync(cities);
-            stopWatch.Stop();
-            Console.WriteLine($"\tfor async request: {stopWatch.ElapsedMilliseconds}ms");
-
-            stopWatch = Stopwatch.StartNew();
-
-            var citiesWeatherInformationParallel =  weatherCollector.CollectWeatherInformationParallel(cities).ToList();
-            stopWatch.Stop();
-            Console.WriteLine($"\tfor parallel request: {stopWatch.ElapsedMilliseconds}ms");
-
-            stopWatch = Stopwatch.StartNew();
-
-            var citiesWeatherInformationSequential = weatherCollector.CollectWeatherInformationSequential(cities).ToList();
-            stopWatch.Stop();
-            Console.WriteLine($"\tfor sequential request: {stopWatch.ElapsedMilliseconds}ms\n");
-
-            // informationDisplay.Display(citiesWeatherInformation.ToList());
+            var citiesWeather = await RetrieveCitiesWeatherInformation(_cities);
+            informationDisplay.PrintConsole(citiesWeather.ToList());
 
             Console.WriteLine($"\nPress any key to exit...\n");
-        }
-
-        private static void OnTimedEvent (Object source, ElapsedEventArgs e)
-        {
-            RetrieveCitiesWeatherInformation();
         }
 
         private static void ConfigureServices()

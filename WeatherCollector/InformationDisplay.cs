@@ -10,11 +10,11 @@ namespace WeatherCollector.ConsoleApp
         {
         }
 
-        public void Display (List<CityWeatherEntity> citiesWeatherInformation)
+        public void PrintConsole (List<WeatherEntity> citiesWeather)
         {
-            foreach (var cityWeatherInformation in citiesWeatherInformation)
+            foreach (var cityWeather in citiesWeather)
             {
-                Console.WriteLine(cityWeatherInformation);
+                Console.WriteLine(cityWeather);
             }
         }
     }

@@ -12,7 +12,7 @@ namespace Infrastructure
             weatherCollectorDbContext = dbContext;
         }
 
-        public CityWeatherEntity Save (CityWeatherEntity cityWeather)
+        public WeatherEntity Save (WeatherEntity cityWeather)
         {
             var city = GetCityWeather(cityWeather.City);
 
@@ -29,13 +29,13 @@ namespace Infrastructure
             return Add(cityWeather);
         }
 
-        public CityWeatherEntity Add (CityWeatherEntity cityWeather)
+        public WeatherEntity Add (WeatherEntity cityWeather)
         {
             weatherCollectorDbContext.Add(cityWeather);
             return cityWeather;
         }
 
-        public CityWeatherEntity Update (CityWeatherEntity cityWeather)
+        public WeatherEntity Update (WeatherEntity cityWeather)
         {
             var entity = weatherCollectorDbContext.cityWeathers.Attach(cityWeather);
             entity.State = EntityState.Modified;
@@ -43,7 +43,7 @@ namespace Infrastructure
             return cityWeather;
         }
 
-        public CityWeatherEntity GetCityWeather (string name)
+        public WeatherEntity GetCityWeather (string name)
         {
             return weatherCollectorDbContext.cityWeathers.SingleOrDefault(x => x.City == name);
         }

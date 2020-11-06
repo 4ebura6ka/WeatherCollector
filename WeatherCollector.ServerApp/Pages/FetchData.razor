@@ -6,6 +6,8 @@
         <p>Cities: <InputText @bind-Value="@ForecastModel.Cities"></InputText></p>
     </EditForm>
 
+    <progress id="p" max=100><span>10</span></progress>
+
     <a class="btn btn-primary" @onclick="@RetrieveCityWeatherAsync"> Async </a>
     <a class="btn btn-primary" @onclick="@RetrieveCityWeatherParallel"> Parallel </a>
     <a class="btn btn-primary" @onclick="@RetrieveCityWeatherSequential"> Sequential </a>
